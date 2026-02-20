@@ -83,7 +83,7 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "API Support",
-        "url": "https://github.com/yourname/gsheets-json-api",
+        "url": "https://github.com/VernaculusF/gsheets-json-api",
         "email": "support@example.com",
     },
     license_info={

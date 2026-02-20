@@ -23,6 +23,8 @@
 - ✅ **Docker** - готов к контейнеризации
 - ✅ **Type hints** - полная типизация кода
 
+> **Примечание:** Это **read-only API**. Оно получает данные из Google Sheets, но не поддерживает операции записи (POST/PUT/DELETE). Сервисному аккаунту требуются только права Viewer.
+
 ## 🛠 Технологии
 
 - **Python 3.10+**
@@ -37,7 +39,7 @@
 ### 1. Клонировать репозиторий
 
 ```bash
-git clone https://github.com/yourname/gsheets-json-api.git
+git clone https://github.com/VernaculusF/gsheets-json-api.git
 cd gsheets-json-api
 ```
 

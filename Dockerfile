@@ -1,5 +1,5 @@
 # Multi-stage build для оптимизации размера образа
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 # Установка системных зависимостей
 RUN apt-get update && apt-get install -y \

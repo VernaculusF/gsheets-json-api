@@ -23,6 +23,8 @@ This project provides a simple and powerful REST API for reading data from Googl
 - ✅ **Docker** - containerization ready
 - ✅ **Type hints** - fully typed code
 
+> **Note:** This is a **read-only API**. It retrieves data from Google Sheets but does not support write operations (POST/PUT/DELETE). The service account only requires Viewer permissions.
+
 ## 🛠 Technologies
 
 - **Python 3.10+**
@@ -37,7 +39,7 @@ This project provides a simple and powerful REST API for reading data from Googl
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourname/gsheets-json-api.git
+git clone https://github.com/VernaculusF/gsheets-json-api.git
 cd gsheets-json-api
 ```
 
