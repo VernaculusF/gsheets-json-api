@@ -1,6 +1,6 @@
 """
-Модуль для работы с Google Sheets API.
-Содержит клиенты для синхронного и асинхронного доступа к таблицам.
+Module for working with Google Sheets API.
+Contains clients for synchronous and asynchronous access to spreadsheets.
 """
 
 import gspread
@@ -14,18 +14,18 @@ logger = logging.getLogger(__name__)
 
 class GoogleSheetsClient:
     """
-    Синхронный клиент для работы с Google Sheets.
-    Использует gspread и service account для аутентификации.
+    Synchronous client for working with Google Sheets.
+    Uses gspread and service account for authentication.
     """
     
     def __init__(self, credentials_file: str, spreadsheet_id: str, sheet_name: str):
         """
-        Инициализация клиента Google Sheets.
+        Initialize Google Sheets client.
         
         Args:
-            credentials_file: Путь к JSON файлу с credentials сервисного аккаунта
-            spreadsheet_id: ID Google Spreadsheet (из URL)
-            sheet_name: Название листа в таблице
+            credentials_file: Path to JSON file with service account credentials
+            spreadsheet_id: Google Spreadsheet ID (from URL)
+            sheet_name: Sheet name in the spreadsheet
         """
         self.credentials_file = credentials_file
         self.spreadsheet_id = spreadsheet_id
@@ -36,14 +36,14 @@ class GoogleSheetsClient:
     
     def _get_client(self) -> gspread.Client:
         """
-        Ленивая инициализация gspread клиента.
-        Клиент создаётся только при первом обращении.
+        Lazy initialization of gspread client.
+        Client is created only on first access.
         
         Returns:
-            gspread.Client: Аутентифицированный клиент
+            gspread.Client: Authenticated client
         
         Raises:
-            Exception: Если не удалось аутентифицироваться
+            Exception: If authentication failed
         """
         if self._client is None:
             try:
@@ -57,27 +57,27 @@ class GoogleSheetsClient:
     
     def get_data(self) -> List[Dict[str, str]]:
         """
-        Получить все данные из Google Sheets таблицы.
-        Первая строка считается заголовками (ключи JSON).
+        Get all data from Google Sheets spreadsheet.
+        First row is considered headers (JSON keys).
         
         Returns:
-            List[Dict[str, str]]: Список словарей, где ключи - заголовки из первой строки
+            List[Dict[str, str]]: List of dictionaries where keys are headers from first row
         
         Raises:
-            Exception: При ошибках доступа к таблице или листу
+            Exception: On errors accessing spreadsheet or sheet
         """
         try:
             client = self._get_client()
             
-            # Открываем таблицу по ID
+            # Open spreadsheet by ID
             spreadsheet = client.open_by_key(self.spreadsheet_id)
             logger.debug(f"Opened spreadsheet: {spreadsheet.title}")
             
-            # Получаем лист по названию
+            # Get sheet by name
             worksheet = spreadsheet.worksheet(self.sheet_name)
             logger.debug(f"Opened worksheet: {self.sheet_name}")
             
-            # Получаем все значения
+            # Get all values
             all_values = worksheet.get_all_values()
             
             if not all_values:
@@ -88,7 +88,7 @@ class GoogleSheetsClient:
                 logger.warning("Spreadsheet has no headers")
                 return []
             
-            # Первая строка - заголовки
+            # First row - headers
             headers = all_values[0]
             data_rows = all_values[1:]
             
@@ -96,13 +96,13 @@ class GoogleSheetsClient:
                 logger.warning("Headers row is empty")
                 return []
             
-            # Преобразуем в список словарей
+            # Convert to list of dictionaries
             result = []
-            for row_index, row in enumerate(data_rows, start=2):  # +2 т.к. нумерация с 1 и пропускаем заголовки
-                # Дополняем короткие строки пустыми значениями
+            for row_index, row in enumerate(data_rows, start=2):  # +2 because numbering from 1 and skip headers
+                # Pad short rows with empty values
                 padded_row = row + [''] * (len(headers) - len(row))
                 
-                # Создаём словарь, связывая заголовки со значениями
+                # Create dictionary, linking headers with values
                 row_dict = dict(zip(headers, padded_row))
                 result.append(row_dict)
             
@@ -125,21 +125,21 @@ class GoogleSheetsClient:
 
 class AsyncGoogleSheetsClient:
     """
-    Асинхронный клиент для работы с Google Sheets.
+    Asynchronous client for working with Google Sheets.
     
-    Примечание: gspread сам по себе синхронный, поэтому мы используем
-    asyncio.to_thread() для выполнения блокирующих операций в отдельном потоке.
-    Это позволяет не блокировать event loop FastAPI.
+    Note: gspread itself is synchronous, so we use
+    asyncio.to_thread() to execute blocking operations in a separate thread.
+    This allows not blocking FastAPI's event loop.
     """
     
     def __init__(self, credentials_file: str, spreadsheet_id: str, sheet_name: str):
         """
-        Инициализация асинхронного клиента Google Sheets.
+        Initialize asynchronous Google Sheets client.
         
         Args:
-            credentials_file: Путь к JSON файлу с credentials
-            spreadsheet_id: ID Google Spreadsheet
-            sheet_name: Название листа
+            credentials_file: Path to JSON file with credentials
+            spreadsheet_id: Google Spreadsheet ID
+            sheet_name: Sheet name
         """
         self.credentials_file = credentials_file
         self.spreadsheet_id = spreadsheet_id
@@ -149,7 +149,7 @@ class AsyncGoogleSheetsClient:
         logger.info(f"Initializing AsyncGoogleSheetsClient for sheet: {sheet_name}")
     
     def _get_client(self) -> gspread.Client:
-        """Ленивая инициализация gspread клиента"""
+        """Lazy initialization of gspread client"""
         if self._client is None:
             try:
                 from pathlib import Path
@@ -162,17 +162,17 @@ class AsyncGoogleSheetsClient:
     
     async def get_data(self) -> List[Dict[str, str]]:
         """
-        Асинхронно получить данные из Google Sheets.
+        Asynchronously get data from Google Sheets.
         
         Returns:
-            List[Dict[str, str]]: Список словарей, где ключи - заголовки из первой строки
+            List[Dict[str, str]]: List of dictionaries where keys are headers from first row
         
         Raises:
-            Exception: При ошибках доступа к таблице
+            Exception: On errors accessing spreadsheet
         """
         try:
-            # Выполняем синхронную операцию в отдельном потоке
-            # чтобы не блокировать event loop
+            # Execute synchronous operation in a separate thread
+            # to not block the event loop
             data = await asyncio.to_thread(self._fetch_data_sync)
             logger.info(f"Successfully fetched {len(data)} rows (async)")
             return data
@@ -182,33 +182,33 @@ class AsyncGoogleSheetsClient:
     
     def _fetch_data_sync(self) -> List[Dict[str, str]]:
         """
-        Синхронная функция для получения данных.
-        Запускается в отдельном потоке через asyncio.to_thread().
+        Synchronous function for getting data.
+        Runs in a separate thread via asyncio.to_thread().
         
         Returns:
-            List[Dict[str, str]]: Список словарей с данными
+            List[Dict[str, str]]: List of dictionaries with data
         """
         client = self._get_client()
         spreadsheet = client.open_by_key(self.spreadsheet_id)
         worksheet = spreadsheet.worksheet(self.sheet_name)
         
-        # Получаем все значения
+        # Get all values
         all_values = worksheet.get_all_values()
         
         if not all_values or len(all_values) < 1:
             return []
         
-        # Первая строка - заголовки
+        # First row - headers
         headers = all_values[0]
         data_rows = all_values[1:]
         
         if not headers:
             return []
         
-        # Преобразуем в список словарей
+        # Convert to list of dictionaries
         result = []
         for row in data_rows:
-            # Дополняем короткие строки пустыми значениями
+            # Pad short rows with empty values
             padded_row = row + [''] * (len(headers) - len(row))
             row_dict = dict(zip(headers, padded_row))
             result.append(row_dict)
@@ -218,12 +218,12 @@ class AsyncGoogleSheetsClient:
     @lru_cache(maxsize=128)
     async def get_data_cached(self, cache_key: str) -> List[Dict[str, str]]:
         """
-        Кэшированная версия get_data() для уменьшения запросов к API.
+        Cached version of get_data() to reduce API requests.
         
         Args:
-            cache_key: Уникальный ключ для кэша (например, timestamp с округлением)
+            cache_key: Unique cache key (e.g., timestamp with rounding)
         
         Returns:
-            List[Dict[str, str]]: Кэшированные или свежие данные
+            List[Dict[str, str]]: Cached or fresh data
         """
         return await self.get_data()

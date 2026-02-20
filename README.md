@@ -1,47 +1,47 @@
 # Google Sheets JSON API
 
-🚀 REST API для получения данных из Google Sheets в JSON формате с поддержкой фильтрации и пагинации.
+🚀 REST API for retrieving data from Google Sheets in JSON format with filtering and pagination support.
 
-## 📋 Описание
+## 📋 Description
 
-Этот проект предоставляет простой и мощный REST API для чтения данных из Google Sheets таблиц. Идеально подходит для:
+This project provides a simple and powerful REST API for reading data from Google Sheets. Perfect for:
 
-- Создания публичных API на основе Google Sheets
-- Интеграции Google Sheets с веб-приложениями
-- Быстрого прототипирования API без базы данных
-- CMS на основе Google Sheets
+- Creating public APIs based on Google Sheets
+- Integrating Google Sheets with web applications
+- Rapid API prototyping without a database
+- CMS based on Google Sheets
 
-## ✨ Возможности
+## ✨ Features
 
-- ✅ **Чтение данных** из Google Sheets в реальном времени
-- ✅ **Фильтрация** по любым колонкам через query parameters
-- ✅ **Пагинация** для работы с большими таблицами
-- ✅ **Rate Limiting** - защита от DDoS (60 запросов/минуту с IP)
-- ✅ **Автоматическая документация** - Swagger UI и ReDoc
-- ✅ **Асинхронная обработка** - высокая производительность
-- ✅ **CORS** - поддержка запросов из браузера
-- ✅ **Docker** - готов к контейнеризации
-- ✅ **Type hints** - полная типизация кода
+- ✅ **Real-time data reading** from Google Sheets
+- ✅ **Filtering** by any columns via query parameters
+- ✅ **Pagination** for handling large spreadsheets
+- ✅ **Rate Limiting** - DDoS protection (60 requests/minute per IP)
+- ✅ **Automatic documentation** - Swagger UI and ReDoc
+- ✅ **Async processing** - high performance
+- ✅ **CORS** - browser request support
+- ✅ **Docker** - containerization ready
+- ✅ **Type hints** - fully typed code
 
-## 🛠 Технологии
+## 🛠 Technologies
 
 - **Python 3.10+**
-- **FastAPI** - современный веб-фреймворк
-- **gspread** - клиент для Google Sheets API
-- **google-auth** - аутентификация через сервисный аккаунт
-- **uvicorn** - ASGI сервер
+- **FastAPI** - modern web framework
+- **gspread** - Google Sheets API client
+- **google-auth** - service account authentication
+- **uvicorn** - ASGI server
 - **slowapi** - rate limiting
 
-## 📦 Установка и настройка
+## 📦 Installation and Setup
 
-### 1. Клонировать репозиторий
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/yourname/gsheets-json-api.git
 cd gsheets-json-api
 ```
 
-### 2. Создать виртуальное окружение
+### 2. Create virtual environment
 
 ```bash
 # Windows
@@ -53,92 +53,92 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Установить зависимости
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Получить credentials от Google Cloud
+### 4. Get credentials from Google Cloud
 
-#### Шаг 1: Создать проект в Google Cloud Console
+#### Step 1: Create a project in Google Cloud Console
 
-1. Перейти на [Google Cloud Console](https://console.cloud.google.com/)
-2. Создать новый проект или выбрать существующий
-3. Включить **Google Sheets API**:
-   - В меню выбрать "APIs & Services" → "Enable APIs and Services"
-   - Найти "Google Sheets API" и включить
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable **Google Sheets API**:
+   - In the menu, select "APIs & Services" → "Enable APIs and Services"
+   - Search for "Google Sheets API" and enable it
 
-#### Шаг 2: Создать сервисный аккаунт
+#### Step 2: Create a service account
 
-1. Перейти в "APIs & Services" → "Credentials"
-2. Нажать "Create Credentials" → "Service Account"
-3. Заполнить:
+1. Go to "APIs & Services" → "Credentials"
+2. Click "Create Credentials" → "Service Account"
+3. Fill in:
    - **Service account name**: `gsheets-api-service`
-   - **Service account ID**: автогенерируется
-   - Нажать "Create and Continue"
-4. Роль: можно пропустить (не требуется для Sheets API)
-5. Нажать "Done"
+   - **Service account ID**: auto-generated
+   - Click "Create and Continue"
+4. Role: can be skipped (not required for Sheets API)
+5. Click "Done"
 
-#### Шаг 3: Создать ключ (credentials)
+#### Step 3: Create a key (credentials)
 
-1. В списке сервисных аккаунтов кликнуть на созданный аккаунт
-2. Перейти на вкладку "Keys"
-3. Нажать "Add Key" → "Create new key"
-4. Выбрать формат **JSON**
-5. Скачать файл - это ваш `creds.json`
+1. In the service accounts list, click on the created account
+2. Go to the "Keys" tab
+3. Click "Add Key" → "Create new key"
+4. Select **JSON** format
+5. Download the file - this is your `creds.json`
 
-#### Шаг 4: Сохранить credentials
+#### Step 4: Save credentials
 
 ```bash
-# Переместить скачанный файл в корень проекта
+# Move the downloaded file to the project root
 mv ~/Downloads/your-project-xxxxx.json creds.json
 ```
 
-⚠️ **Важно**: Не коммитьте `creds.json` в git! Файл уже добавлен в `.gitignore`.
+⚠️ **Important**: Don't commit `creds.json` to git! The file is already added to `.gitignore`.
 
-### 5. Расшарить Google Sheets таблицу
+### 5. Share the Google Sheets spreadsheet
 
-1. Открыть вашу Google Sheets таблицу
-2. Нажать кнопку "Share" (Поделиться)
-3. Скопировать **email** сервисного аккаунта из `creds.json`:
+1. Open your Google Sheets spreadsheet
+2. Click the "Share" button
+3. Copy the **email** of the service account from `creds.json`:
    ```json
    "client_email": "gsheets-api-service@your-project.iam.gserviceaccount.com"
    ```
-4. Вставить этот email в поле "Add people and groups"
-5. Установить права **Viewer** (только чтение)
-6. Нажать "Send"
+4. Paste this email into the "Add people and groups" field
+5. Set permissions to **Viewer** (read-only)
+6. Click "Send"
 
-### 6. Настроить переменные окружения
+### 6. Configure environment variables
 
 ```bash
-# Скопировать пример
+# Copy the example
 cp .env.example .env
 
-# Отредактировать .env файл
+# Edit the .env file
 ```
 
-Заполнить `.env`:
+Fill in `.env`:
 
 ```env
-# ID таблицы (из URL Google Sheets)
+# Spreadsheet ID (from Google Sheets URL)
 # https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-#                                     ^^^^^^^^ это SPREADSHEET_ID ^^^^^^^^
+#                                     ^^^^^^^^ this is SPREADSHEET_ID ^^^^^^^^
 SPREADSHEET_ID=1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms
 
-# Название листа в таблице (по умолчанию "Sheet1")
+# Sheet name in the spreadsheet (default "Sheet1")
 SHEET_NAME=Sheet1
 
-# Порт сервера
+# Server port
 PORT=8000
 
-# Уровень логирования (DEBUG, INFO, WARNING, ERROR)
+# Logging level (DEBUG, INFO, WARNING, ERROR)
 LOG_LEVEL=INFO
 ```
 
-### 7. Формат Google Sheets таблицы
+### 7. Google Sheets format
 
-Таблица должна иметь **заголовки в первой строке**:
+The spreadsheet must have **headers in the first row**:
 
 | Name    | Age | City     | Email              |
 |---------|-----|----------|--------------------|
@@ -146,44 +146,44 @@ LOG_LEVEL=INFO
 | Bob     | 25  | SPb      | bob@example.com    |
 | Charlie | 35  | Kazan    | charlie@example.com|
 
-- **Первая строка** = заголовки (ключи JSON)
-- **Остальные строки** = данные (значения JSON)
+- **First row** = headers (JSON keys)
+- **Other rows** = data (JSON values)
 
-## 🚀 Запуск
+## 🚀 Running
 
-### Локальный запуск
+### Local run
 
 ```bash
-# Активировать виртуальное окружение
+# Activate virtual environment
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 
-# Запустить сервер
+# Start the server
 python app.py
 
-# Или через uvicorn напрямую
+# Or via uvicorn directly
 uvicorn app:app --reload --port 8000
 ```
 
-Сервер будет доступен на `http://localhost:8000`
+The server will be available at `http://localhost:8000`
 
-### Документация API
+### API Documentation
 
-После запуска откройте в браузере:
+After starting, open in your browser:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 📖 Использование API
+## 📖 API Usage
 
-### Базовый запрос
+### Basic request
 
 ```bash
-# Получить все данные (первые 100 записей)
+# Get all data (first 100 records)
 curl http://localhost:8000/api/data
 ```
 
-**Ответ:**
+**Response:**
 ```json
 {
   "total": 3,
@@ -213,32 +213,32 @@ curl http://localhost:8000/api/data
 }
 ```
 
-### Фильтрация
+### Filtering
 
 ```bash
-# Фильтр по городу
+# Filter by city
 curl "http://localhost:8000/api/data?city=Moscow"
 
-# Фильтр по возрасту
+# Filter by age
 curl "http://localhost:8000/api/data?age=30"
 
-# Поиск по имени (частичное совпадение)
+# Search by name (partial match)
 curl "http://localhost:8000/api/data?name=Ali"
 
-# Комбинация фильтров
+# Combined filters
 curl "http://localhost:8000/api/data?city=Moscow&age=30"
 ```
 
-### Пагинация
+### Pagination
 
 ```bash
-# Первые 10 записей
+# First 10 records
 curl "http://localhost:8000/api/data?limit=10&offset=0"
 
-# Следующие 10 записей
+# Next 10 records
 curl "http://localhost:8000/api/data?limit=10&offset=10"
 
-# С фильтром и пагинацией
+# With filter and pagination
 curl "http://localhost:8000/api/data?city=Moscow&limit=5&offset=0"
 ```
 
@@ -248,7 +248,7 @@ curl "http://localhost:8000/api/data?city=Moscow&limit=5&offset=0"
 curl http://localhost:8000/health
 ```
 
-**Ответ:**
+**Response:**
 ```json
 {
   "status": "ok",
@@ -260,13 +260,13 @@ curl http://localhost:8000/health
 
 ## 🐳 Docker
 
-### Сборка образа
+### Build image
 
 ```bash
 docker build -t gsheets-json-api .
 ```
 
-### Запуск контейнера
+### Run container
 
 ```bash
 docker run -d \
@@ -281,42 +281,42 @@ docker run -d \
 ### Docker Compose
 
 ```bash
-# Запустить все сервисы
+# Start all services
 docker-compose up -d
 
-# Посмотреть логи
+# View logs
 docker-compose logs -f api
 
-# Остановить
+# Stop
 docker-compose down
 ```
 
-## ☁️ Деплой на Google Cloud Run
+## ☁️ Deploy to Google Cloud Run
 
-### Подготовка
+### Preparation
 
-1. Установить [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
-2. Аутентифицироваться:
+1. Install [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+2. Authenticate:
    ```bash
    gcloud auth login
    ```
 
-### Создать Secret для credentials
+### Create Secret for credentials
 
 ```bash
-# Создать secret с содержимым creds.json
+# Create secret with creds.json contents
 gcloud secrets create gsheets-creds \
   --data-file=creds.json \
   --replication-policy=automatic
 ```
 
-### Деплой
+### Deploy
 
 ```bash
-# Собрать и загрузить образ
+# Build and upload image
 gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/gsheets-api
 
-# Задеплоить на Cloud Run
+# Deploy to Cloud Run
 gcloud run deploy gsheets-api \
   --image gcr.io/YOUR_PROJECT_ID/gsheets-api \
   --platform managed \
@@ -326,128 +326,128 @@ gcloud run deploy gsheets-api \
   --set-secrets /app/creds.json=gsheets-creds:latest
 ```
 
-После деплоя вы получите URL типа:
+After deployment, you'll get a URL like:
 ```
 https://gsheets-api-xxxxx-uc.a.run.app
 ```
 
-### Обновление
+### Updating
 
 ```bash
-# Повторить команды build и deploy
+# Repeat build and deploy commands
 gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/gsheets-api
 gcloud run deploy gsheets-api --image gcr.io/YOUR_PROJECT_ID/gsheets-api
 ```
 
-## 🧪 Тестирование
+## 🧪 Testing
 
-### Установить dev-зависимости
+### Install dev dependencies
 
 ```bash
 pip install -r requirements-dev.txt
 ```
 
-### Запустить тесты
+### Run tests
 
 ```bash
-# Все тесты
+# All tests
 pytest
 
-# С покрытием кода
+# With code coverage
 pytest --cov=. --cov-report=html
 
-# Конкретный файл
+# Specific file
 pytest tests/test_api.py -v
 ```
 
-### Линтинг и форматирование
+### Linting and formatting
 
 ```bash
-# Форматирование кода
+# Code formatting
 black .
 isort .
 
-# Проверка стиля
+# Style check
 flake8 .
 
-# Проверка типов
+# Type checking
 mypy app.py sheets_client.py config.py
 ```
 
 ## 🔧 Troubleshooting
 
-### Ошибка: "Failed to authenticate with Google Sheets"
+### Error: "Failed to authenticate with Google Sheets"
 
-**Причина**: Неверный или отсутствующий `creds.json`
+**Cause**: Invalid or missing `creds.json`
 
-**Решение**:
-- Проверить, что файл `creds.json` существует
-- Проверить формат JSON (должен быть валидным)
-- Убедиться, что Google Sheets API включен в проекте
+**Solution**:
+- Check that the `creds.json` file exists
+- Verify JSON format (must be valid)
+- Ensure Google Sheets API is enabled in the project
 
-### Ошибка: "Spreadsheet not found or not shared"
+### Error: "Spreadsheet not found or not shared"
 
-**Причина**: Таблица не расшарена с сервисным аккаунтом
+**Cause**: Spreadsheet is not shared with the service account
 
-**Решение**:
-- Открыть Google Sheets таблицу
-- Нажать "Share"
-- Добавить email из `client_email` в `creds.json`
-- Установить права Viewer
+**Solution**:
+- Open the Google Sheets spreadsheet
+- Click "Share"
+- Add the email from `client_email` in `creds.json`
+- Set Viewer permissions
 
-### Ошибка: "Worksheet 'SheetName' not found"
+### Error: "Worksheet 'SheetName' not found"
 
-**Причина**: Неверное название листа в `.env`
+**Cause**: Incorrect sheet name in `.env`
 
-**Решение**:
-- Проверить точное название листа в Google Sheets (с учетом регистра)
-- Обновить `SHEET_NAME` в `.env` файле
+**Solution**:
+- Check the exact sheet name in Google Sheets (case-sensitive)
+- Update `SHEET_NAME` in the `.env` file
 
 ### Rate Limit Exceeded (429)
 
-**Причина**: Превышен лимит запросов (60/минуту)
+**Cause**: Rate limit exceeded (60/minute)
 
-**Решение**:
-- Подождать 1 минуту
-- Уменьшить частоту запросов
-- Настроить другой лимит в `app.py` (`@limiter.limit("60/minute")`)
+**Solution**:
+- Wait 1 minute
+- Reduce request frequency
+- Configure a different limit in `app.py` (`@limiter.limit("60/minute")`)
 
-### Пустой ответ (empty data array)
+### Empty response (empty data array)
 
-**Причины**:
-1. Таблица действительно пуста
-2. Первая строка не содержит заголовков
-3. Все данные отфильтрованы
+**Causes**:
+1. The spreadsheet is actually empty
+2. The first row doesn't contain headers
+3. All data is filtered out
 
-**Решение**:
-- Проверить содержимое таблицы
-- Убедиться, что первая строка содержит заголовки
-- Проверить фильтры в запросе
+**Solution**:
+- Check the spreadsheet contents
+- Ensure the first row contains headers
+- Check the filters in the request
 
-## 📚 Дополнительные ресурсы
+## 📚 Additional Resources
 
-- [FastAPI документация](https://fastapi.tiangolo.com/)
-- [gspread документация](https://docs.gspread.org/)
+- [FastAPI documentation](https://fastapi.tiangolo.com/)
+- [gspread documentation](https://docs.gspread.org/)
 - [Google Cloud Console](https://console.cloud.google.com/)
 - [Google Sheets API](https://developers.google.com/sheets/api)
-- [Cloud Run документация](https://cloud.google.com/run/docs)
+- [Cloud Run documentation](https://cloud.google.com/run/docs)
 
-## 🤝 Вклад в проект
+## 🤝 Contributing
 
-Pull requests приветствуются! Для серьезных изменений откройте issue для обсуждения.
+Pull requests are welcome! For major changes, please open an issue first to discuss.
 
-## 📄 Лицензия
+## 📄 License
 
 [MIT](https://opensource.org/licenses/MIT)
 
-## 👤 Автор
+## 👤 Author
 
-Ваше имя - [@yourhandle](https://github.com/yourhandle)
+Your Name - [@yourhandle](https://github.com/yourhandle)
 
-## ⭐ Поддержка
+## ⭐ Support
 
-Если проект оказался полезным, поставьте звезду ⭐ на GitHub!
+If you found this project helpful, give it a star ⭐ on GitHub!
 
 ---
 
-**Сделано с ❤️ и FastAPI**
+**Made with ❤️ and FastAPI**

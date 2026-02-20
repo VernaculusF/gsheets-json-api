@@ -1,6 +1,6 @@
 """
-Модуль конфигурации приложения.
-Загружает и валидирует переменные окружения из .env файла.
+Application configuration module.
+Loads and validates environment variables from .env file.
 """
 
 import os
@@ -8,49 +8,49 @@ from pathlib import Path
 from dotenv import load_dotenv
 import logging
 
-# Загружаем переменные окружения из .env файла
+# Load environment variables from .env file
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 
 class Config:
-    """Класс для хранения и валидации конфигурации приложения"""
+    """Class for storing and validating application configuration"""
     
-    # Google Sheets настройки
+    # Google Sheets settings
     SPREADSHEET_ID: str = os.getenv("SPREADSHEET_ID", "")
     SHEET_NAME: str = os.getenv("SHEET_NAME", "Sheet1")
     
-    # Путь к credentials файлу
+    # Path to credentials file
     CREDENTIALS_FILE: str = os.getenv("CREDENTIALS_FILE", "creds.json")
     
-    # Настройки сервера
+    # Server settings
     PORT: int = int(os.getenv("PORT", "8000"))
     HOST: str = os.getenv("HOST", "0.0.0.0")
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
-    # Опциональные настройки
+    # Optional settings
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
     @classmethod
     def validate(cls) -> None:
         """
-        Валидация обязательных переменных окружения.
+        Validate required environment variables.
         
         Raises:
-            ValueError: если обязательные переменные не заданы
-            FileNotFoundError: если credentials файл не найден
+            ValueError: if required variables are not set
+            FileNotFoundError: if credentials file not found
         """
         errors = []
         
-        # Проверка обязательных переменных
+        # Check required variables
         if not cls.SPREADSHEET_ID:
             errors.append("SPREADSHEET_ID is not set in .env file")
         
         if not cls.SHEET_NAME:
             errors.append("SHEET_NAME is not set in .env file")
         
-        # Проверка существования credentials файла
+        # Check credentials file existence
         credentials_path = Path(cls.CREDENTIALS_FILE)
         if not credentials_path.exists():
             errors.append(
@@ -58,7 +58,7 @@ class Config:
                 f"Please create it from creds.json.example"
             )
         
-        # Если есть ошибки, выбросить исключение
+        # If there are errors, raise exception
         if errors:
             error_message = "Configuration validation failed:\n" + "\n".join(f"  - {err}" for err in errors)
             logger.error(error_message)
@@ -69,10 +69,10 @@ class Config:
     @classmethod
     def get_info(cls) -> dict:
         """
-        Получить информацию о конфигурации (безопасная версия без секретов).
+        Get configuration information (safe version without secrets).
         
         Returns:
-            dict: Словарь с настройками (ID таблицы замаскирован)
+            dict: Dictionary with settings (spreadsheet ID masked)
         """
         spreadsheet_id_masked = (
             f"{cls.SPREADSHEET_ID[:4]}...{cls.SPREADSHEET_ID[-4:]}"
@@ -91,11 +91,11 @@ class Config:
         }
 
 
-# Валидация конфигурации при импорте модуля
+# Validate configuration on module import
 try:
     Config.validate()
 except ValueError as e:
-    # В production можно перехватывать и логировать, 
-    # но для разработки лучше сразу упасть
+    # In production, can catch and log,
+    # but for development better to fail immediately
     logger.warning(f"Config validation skipped or failed: {e}")
-    # raise  # Раскомментировать в production
+    # raise  # Uncomment in production

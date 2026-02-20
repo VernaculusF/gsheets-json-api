@@ -1,6 +1,6 @@
 """
-Основное FastAPI приложение для Google Sheets JSON API.
-Предоставляет REST API для получения данных из Google Sheets в JSON формате.
+Main FastAPI application for Google Sheets JSON API.
+Provides REST API for retrieving data from Google Sheets in JSON format.
 """
 
 from fastapi import FastAPI, Query, HTTPException, status, Request
@@ -16,7 +16,7 @@ import sys
 from config import Config
 from sheets_client import AsyncGoogleSheetsClient
 
-# Настройка логирования
+# Logging configuration
 logging.basicConfig(
     level=getattr(logging, Config.LOG_LEVEL.upper()),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,56 +27,56 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Метаданные для OpenAPI документации
+# Metadata for OpenAPI documentation
 tags_metadata = [
     {
         "name": "data",
-        "description": "Операции с данными из Google Sheets. "
-                      "Поддерживается фильтрация и пагинация.",
+        "description": "Operations with data from Google Sheets. "
+                      "Supports filtering and pagination.",
     },
     {
         "name": "health",
-        "description": "Проверка состояния сервиса и готовности к работе.",
+        "description": "Service health and readiness checks.",
     },
 ]
 
-# Инициализация FastAPI приложения
+# Initialize FastAPI application
 app = FastAPI(
     title="Google Sheets JSON API",
     description="""
-    🚀 **REST API для получения данных из Google Sheets в JSON формате.**
+    🚀 **REST API for retrieving data from Google Sheets in JSON format.**
     
-    ## Возможности
+    ## Features
     
-    * **Чтение данных** из Google Sheets в реальном времени
-    * **Фильтрация** по любым колонкам (query parameters)
-    * **Пагинация** для работы с большими таблицами
-    * **Rate Limiting** для защиты от злоупотреблений
-    * **Асинхронная обработка** запросов для высокой производительности
+    * **Read data** from Google Sheets in real-time
+    * **Filtering** by any columns (query parameters)
+    * **Pagination** for handling large spreadsheets
+    * **Rate Limiting** to protect against abuse
+    * **Async processing** for high performance
     
-    ## Аутентификация
+    ## Authentication
     
-    API использует сервисный аккаунт Google для доступа к таблицам.
-    Убедитесь, что Google Sheets таблица расшарена с email вашего сервисного аккаунта.
+    API uses Google service account to access spreadsheets.
+    Make sure the Google Sheets spreadsheet is shared with your service account email.
     
-    ## Формат данных
+    ## Data Format
     
-    - **Первая строка** таблицы = заголовки (ключи JSON объектов)
-    - **Остальные строки** = данные (значения JSON объектов)
+    - **First row** of the spreadsheet = headers (JSON object keys)
+    - **Other rows** = data (JSON object values)
     
-    ## Примеры использования
+    ## Usage Examples
     
     ```bash
-    # Получить все данные
+    # Get all data
     curl http://localhost:8000/api/data
     
-    # Фильтрация по городу
+    # Filter by city
     curl "http://localhost:8000/api/data?city=Moscow"
     
-    # Пагинация (первые 10 записей)
+    # Pagination (first 10 records)
     curl "http://localhost:8000/api/data?limit=10&offset=0"
     
-    # Комбинация фильтров
+    # Combined filters
     curl "http://localhost:8000/api/data?city=Moscow&limit=5"
     ```
     """,
@@ -92,26 +92,26 @@ app = FastAPI(
     },
     openapi_tags=tags_metadata,
     docs_url="/docs",  # Swagger UI
-    redoc_url="/redoc",  # ReDoc альтернативная документация
+    redoc_url="/redoc",  # ReDoc alternative documentation
 )
 
-# Настройка CORS (Cross-Origin Resource Sharing)
-# Позволяет запросы из браузера с других доменов
+# CORS (Cross-Origin Resource Sharing) configuration
+# Allows requests from browsers on other domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В production заменить на конкретные домены
+    allow_origins=["*"],  # In production, replace with specific domains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Настройка Rate Limiting
-# Защита от DDoS и злоупотреблений API
+# Rate Limiting configuration
+# Protection against DDoS and API abuse
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore
 
-# Инициализация Google Sheets клиента
+# Initialize Google Sheets client
 sheets_client = AsyncGoogleSheetsClient(
     credentials_file=Config.CREDENTIALS_FILE,
     spreadsheet_id=Config.SPREADSHEET_ID,
@@ -124,7 +124,7 @@ logger.info(f"Configuration: {Config.get_info()}")
 
 @app.on_event("startup")
 async def startup_event():
-    """Действия при запуске приложения"""
+    """Actions on application startup"""
     logger.info("Application startup complete")
     logger.info(f"Swagger UI available at: http://{Config.HOST}:{Config.PORT}/docs")
     logger.info(f"ReDoc available at: http://{Config.HOST}:{Config.PORT}/redoc")
@@ -132,7 +132,7 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Действия при остановке приложения"""
+    """Actions on application shutdown"""
     logger.info("Application shutdown")
 
 
@@ -142,7 +142,7 @@ async def shutdown_event():
     response_class=JSONResponse,
 )
 async def root():
-    """Корневой эндпоинт - редирект на документацию"""
+    """Root endpoint - redirect to documentation"""
     return {
         "message": "Google Sheets JSON API",
         "version": "1.0.0",
@@ -157,20 +157,20 @@ async def root():
     "/health",
     tags=["health"],
     summary="Health Check",
-    response_description="Статус работоспособности сервиса",
+    response_description="Service health status",
     status_code=status.HTTP_200_OK,
 )
 async def health_check():
     """
-    Проверка работоспособности API.
+    API health check.
     
-    Используется для:
-    - Мониторинга сервиса
-    - Health checks в Kubernetes/Cloud Run
-    - Load Balancer проверок
+    Used for:
+    - Service monitoring
+    - Health checks in Kubernetes/Cloud Run
+    - Load Balancer checks
     
     Returns:
-        dict: Статус сервиса и метаданные
+        dict: Service status and metadata
     """
     return {
         "status": "ok",
@@ -183,11 +183,11 @@ async def health_check():
 @app.get(
     "/api/data",
     tags=["data"],
-    summary="Получить данные из Google Sheets",
-    response_description="Список записей в JSON формате с метаданными пагинации",
+    summary="Get data from Google Sheets",
+    response_description="List of records in JSON format with pagination metadata",
     responses={
         200: {
-            "description": "Успешный запрос - данные получены",
+            "description": "Successful request - data retrieved",
             "content": {
                 "application/json": {
                     "example": {
@@ -204,7 +204,7 @@ async def health_check():
             },
         },
         429: {
-            "description": "Слишком много запросов - превышен rate limit",
+            "description": "Too many requests - rate limit exceeded",
             "content": {
                 "application/json": {
                     "example": {"error": "Rate limit exceeded"}
@@ -212,7 +212,7 @@ async def health_check():
             },
         },
         500: {
-            "description": "Ошибка сервера - таблица недоступна или другая проблема",
+            "description": "Server error - spreadsheet unavailable or other issue",
             "content": {
                 "application/json": {
                     "example": {"error": "Failed to fetch data from Google Sheets"}
@@ -221,94 +221,94 @@ async def health_check():
         },
     },
 )
-@limiter.limit("60/minute")  # 60 запросов в минуту с одного IP
+@limiter.limit("60/minute")  # 60 requests per minute per IP
 async def get_data(
-    request: Request,  # Нужен для rate limiter
+    request: Request,  # Required for rate limiter
     limit: int = Query(
         100,
         ge=1,
         le=1000,
-        description="Максимальное количество записей на странице (1-1000)",
+        description="Maximum number of records per page (1-1000)",
         example=10
     ),
     offset: int = Query(
         0,
         ge=0,
-        description="Количество записей для пропуска (для пагинации)",
+        description="Number of records to skip (for pagination)",
         example=0
     ),
-    # Динамические фильтры - можно добавить любые по необходимости
+    # Dynamic filters - can add any as needed
     city: Optional[str] = Query(
         None,
-        description="Фильтр по колонке 'City' (регистронезависимый поиск)",
+        description="Filter by 'City' column (case-insensitive search)",
         example="Moscow"
     ),
     age: Optional[str] = Query(
         None,
-        description="Фильтр по колонке 'Age' (точное совпадение)",
+        description="Filter by 'Age' column (exact match)",
         example="30"
     ),
     name: Optional[str] = Query(
         None,
-        description="Поиск по колонке 'Name' (частичное совпадение, регистронезависимый)",
+        description="Search by 'Name' column (partial match, case-insensitive)",
         example="Alice"
     ),
 ) -> Dict[str, Any]:
     """
-    Получить данные из Google Sheets с поддержкой фильтрации и пагинации.
+    Get data from Google Sheets with filtering and pagination support.
     
-    ## Фильтрация
+    ## Filtering
     
-    Можно комбинировать несколько фильтров:
-    - **city**: точное совпадение (регистронезависимое)
-    - **age**: точное совпадение
-    - **name**: частичное совпадение (поиск подстроки)
+    You can combine multiple filters:
+    - **city**: exact match (case-insensitive)
+    - **age**: exact match
+    - **name**: partial match (substring search)
     
-    ## Пагинация
+    ## Pagination
     
-    Используйте `limit` и `offset` для постраничной навигации:
-    - Страница 1: `?limit=10&offset=0`
-    - Страница 2: `?limit=10&offset=10`
-    - Страница 3: `?limit=10&offset=20`
+    Use `limit` and `offset` for page navigation:
+    - Page 1: `?limit=10&offset=0`
+    - Page 2: `?limit=10&offset=10`
+    - Page 3: `?limit=10&offset=20`
     
-    ## Примеры
+    ## Examples
     
     ```bash
-    # Все данные (первые 100)
+    # All data (first 100)
     curl http://localhost:8000/api/data
     
-    # Фильтр по городу
+    # Filter by city
     curl "http://localhost:8000/api/data?city=Moscow"
     
-    # Поиск по имени
+    # Search by name
     curl "http://localhost:8000/api/data?name=Alice"
     
-    # Пагинация
+    # Pagination
     curl "http://localhost:8000/api/data?limit=10&offset=20"
     
-    # Комбинация фильтров
+    # Combined filters
     curl "http://localhost:8000/api/data?city=Moscow&limit=5"
     ```
     
-    ## Ответ
+    ## Response
     
-    Возвращает JSON объект с полями:
-    - `total`: общее количество записей после фильтрации
-    - `limit`: примененный лимит
-    - `offset`: примененное смещение
-    - `filters_applied`: примененные фильтры
-    - `data`: массив записей
+    Returns a JSON object with fields:
+    - `total`: total number of records after filtering
+    - `limit`: applied limit
+    - `offset`: applied offset
+    - `filters_applied`: applied filters
+    - `data`: array of records
     """
     try:
         logger.info(f"Fetching data with limit={limit}, offset={offset}")
         
-        # Получаем данные из Google Sheets (асинхронно)
+        # Get data from Google Sheets (async)
         data = await sheets_client.get_data()
         
-        # Собираем информацию о примененных фильтрах
+        # Collect information about applied filters
         filters_applied = {}
         
-        # Применяем фильтры
+        # Apply filters
         if city:
             data = [
                 row for row in data 
@@ -333,10 +333,10 @@ async def get_data(
             filters_applied['name'] = name
             logger.debug(f"Applied name filter: {name}")
         
-        # Подсчитываем общее количество после фильтрации
+        # Count total after filtering
         total = len(data)
         
-        # Применяем пагинацию
+        # Apply pagination
         paginated_data = data[offset:offset + limit]
         
         logger.info(
@@ -360,10 +360,10 @@ async def get_data(
         )
 
 
-# Обработчик глобальных исключений
+# Global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """Обработка всех неперехваченных исключений"""
+    """Handle all uncaught exceptions"""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -377,7 +377,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 if __name__ == "__main__":
     import uvicorn
     
-    # Запуск сервера (для локальной разработки)
+    # Start server (for local development)
     uvicorn.run(
         "app:app",
         host=Config.HOST,
