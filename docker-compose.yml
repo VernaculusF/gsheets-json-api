@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gsheets-api
+    ports:
+      - "8000:8000"
+    environment:
+      - SPREADSHEET_ID=${SPREADSHEET_ID}
+      - SHEET_NAME=${SHEET_NAME}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - ENVIRONMENT=development
+    volumes:
+      # Mount credentials (read-only)
+      - ./creds.json:/app/creds.json:ro
+      # Mount code for hot reload in development
+      - ./app.py:/app/app.py:ro
+      - ./sheets_client.py:/app/sheets_client.py:ro
+      - ./config.py:/app/config.py:ro
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - gsheets-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Опционально: Redis для кэширования (если добавите кэш)
+  redis:
+    image: redis:7-alpine
+    container_name: gsheets-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - gsheets-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    # Uncomment для продакшена с персистентностью
+    # command: redis-server --appendonly yes
+
+  # Опционально: Nginx как reverse proxy с rate limiting
+  nginx:
+    image: nginx:alpine
+    container_name: gsheets-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - gsheets-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  gsheets-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
