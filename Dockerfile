@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM python:3.11-slim
 
 # Метаданные
-LABEL maintainer="your-email@example.com"
+LABEL maintainer="VernaculusF"
 LABEL description="Google Sheets JSON API"
 
 # Создание пользователя без root прав (безопасность)
