@@ -2,7 +2,7 @@
 
 Read-only REST API for exposing Google Sheets rows as JSON. The service supports filtering and pagination and authenticates through a Google service account.
 
-## Возможности
+## Features
 
 - Reading worksheet rows through a JSON endpoint
 - Filtering by column values through query parameters
@@ -10,7 +10,7 @@ Read-only REST API for exposing Google Sheets rows as JSON. The service supports
 - Rate limiting, CORS, health checks, Swagger UI, and ReDoc
 - Local and Docker-based execution
 
-## Стек
+## Stack
 
 - Python 3.10+
 - FastAPI and Uvicorn
@@ -18,7 +18,7 @@ Read-only REST API for exposing Google Sheets rows as JSON. The service supports
 - SlowAPI
 - pytest
 
-## Быстрый старт
+## Quick start
 
 Create a Google Cloud service account with access to the target spreadsheet, download its key as `creds.json`, and share the spreadsheet with the service account email. The first worksheet row must contain the JSON field names.
 
@@ -58,7 +58,7 @@ Docker Compose can be used after configuration:
 docker compose up --build
 ```
 
-## Структура проекта
+## Project structure
 
 - `app.py` — FastAPI application and HTTP routes
 - `config.py` — environment-based configuration
@@ -68,6 +68,6 @@ docker compose up --build
 - `creds.json.example` — service account key template
 - `Dockerfile`, `docker-compose.yml`, `nginx.conf` — container deployment files
 
-## Лицензия
+## License
 
 MIT
